@@ -1,0 +1,55 @@
+<div class="page-header">
+  <div class="container-inner">
+    <h1>My profile</h1>
+  </div>
+</div>
+
+<div class="container-inner main-content">
+  <p class="intro-text">
+    These details are optional. They help promoters and investors present themselves
+    professionally on the Portal — none of them are required to submit a project or
+    express interest.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="profile-form">
+
+    <h2>Contact details</h2>
+    <div class="form-row">
+      <div class="mb-3">
+        <label class="form-label">Country</label>
+        <input formControlName="country" type="text" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Occupation or position in the company</label>
+        <input formControlName="occupation" type="text" class="form-control" />
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Preferred contact language</label>
+      <input formControlName="preferredContactLanguage" type="text" class="form-control" />
+    </div>
+
+    <h2>Organisation</h2>
+    <div class="form-row">
+      <div class="mb-3">
+        <label class="form-label">Organisation name</label>
+        <input formControlName="organisationName" type="text" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Organisation country</label>
+        <input formControlName="organisationCountry" type="text" class="form-control" />
+      </div>
+    </div>
+
+    @if (saveError) {
+      <div class="alert alert-danger">{{ saveError }}</div>
+    }
+    @if (saved) {
+      <div class="alert alert-success">Profile saved.</div>
+    }
+
+    <button type="submit" class="btn-primary" [disabled]="saving">
+      {{ saving ? 'Saving...' : 'Save profile' }}
+    </button>
+  </form>
+</div>

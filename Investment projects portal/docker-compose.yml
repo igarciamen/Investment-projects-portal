@@ -1,0 +1,158 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: investeu-postgres
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5439:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Runs once, only the first time the data volume is empty: creates one
+      # database per microservice (see init-databases.sql).
+      - ./init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  users:
+    build: ./users
+    container_name: investeu-users
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/usersInvestEU
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      APP_ADMIN_USERNAME: ${ADMIN_USERNAME:-isabel}
+      APP_ADMIN_PASSWORD: ${ADMIN_PASSWORD:-123456}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  sectors:
+    build: ./sectors
+    container_name: investeu-sectors
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sectorsInvestEU
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # "projects" is the hub: it calls users, sectors, and notifications, so it
+  # waits on all three being up (not just healthy-DB, but actually started).
+  projects:
+    build: ./projects
+    container_name: investeu-projects
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/projectsInvestEU
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      # Relaxed binding: SECTORS_BASE_URL -> sectors.base-url, and so on --
+      # this overrides the "localhost" defaults baked into each
+      # application.properties, without editing a single Java/properties file.
+      SECTORS_BASE_URL: http://sectors:8082/api/sectors
+      USERS_BASE_URL: http://users:8081/api/user
+      NOTIFICATIONS_BASE_URL: http://notifications:8085/api/notifications
+      APP_ADMIN_NOTIFICATION_EMAIL: ${ADMIN_NOTIFICATION_EMAIL:-isabel@admin.local}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      users:
+        condition: service_started
+      sectors:
+        condition: service_started
+      notifications:
+        condition: service_started
+
+  documents:
+    build: ./documents
+    container_name: investeu-documents
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/documentsInvestEU
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      PROJECTS_BASE_URL: http://projects:8083/api/projects
+      # Added: needed by UserClient/EmailClient (notification on new
+      # document upload) -- without these, DocumentService silently falls
+      # back to the "localhost" default baked into application.properties,
+      # which points nowhere inside this container.
+      USERS_BASE_URL: http://users:8081/api/user
+      NOTIFICATIONS_BASE_URL: http://notifications:8085/api/notifications
+      APP_ADMIN_NOTIFICATION_EMAIL: ${ADMIN_NOTIFICATION_EMAIL:-isabel@admin.local}
+      # Uploaded files live in a named volume, not inside the container's
+      # writable layer, so they survive a "docker compose down" / rebuild.
+      DOCUMENTS_STORAGE_PATH: /app/uploads
+    volumes:
+      - documents-uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      projects:
+        condition: service_started
+      notifications:
+        condition: service_started
+
+  notifications:
+    build: ./notifications
+    container_name: investeu-notifications
+    ports:
+      - "8085:8085"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_MAIL_USERNAME: ${GMAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${GMAIL_APP_PASSWORD}
+    # No "depends_on: postgres" -- this is the one microservice with no
+    # database of its own (see the Block 4 documentation).
+
+  interests:
+    build: ./interests
+    container_name: investeu-interests
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/interestsInvestEU
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      PROJECTS_BASE_URL: http://projects:8083/api/projects
+    depends_on:
+      postgres:
+        condition: service_healthy
+      projects:
+        condition: service_started
+
+  messages:
+    build: ./messages
+    container_name: investeu-messages
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/messagesInvestEU
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      PROJECTS_BASE_URL: http://projects:8083/api/projects
+      # Added: needed by UserClient/EmailClient (notification on new message).
+      USERS_BASE_URL: http://users:8081/api/user
+      NOTIFICATIONS_BASE_URL: http://notifications:8085/api/notifications
+    depends_on:
+      postgres:
+        condition: service_healthy
+      projects:
+        condition: service_started
+      notifications:
+        condition: service_started
+
+volumes:
+  pgdata:
+  documents-uploads:

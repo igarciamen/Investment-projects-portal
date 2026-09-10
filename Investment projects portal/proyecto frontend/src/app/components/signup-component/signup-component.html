@@ -1,0 +1,116 @@
+<div class="container mt-5" style="max-width: 500px">
+  <h2 class="mb-4 text-center">Sign Up</h2>
+
+  <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label class="form-label">Username</label>
+      <input
+        type="text"
+        class="form-control"
+        formControlName="username"
+        [ngClass]="{'is-invalid': username.touched && username.invalid}"
+      />
+      @if (username.touched && username.invalid) {
+      <div class="invalid-feedback">
+        @if (username.errors?.['required']) {
+        <div>Username is required.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input
+        type="email"
+        class="form-control"
+        formControlName="email"
+        [ngClass]="{'is-invalid': email.touched && email.invalid}"
+      />
+      @if (email.touched && email.invalid) {
+      <div class="invalid-feedback">
+        @if (email.errors?.['required']) {
+        <div>Email is required.</div>
+        } @if (email.errors?.['email']) {
+        <div>Invalid email format.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Password</label>
+      <input
+        type="password"
+        class="form-control"
+        formControlName="password"
+        [ngClass]="{'is-invalid': password.touched && password.invalid}"
+      />
+      @if (password.touched && password.invalid) {
+      <div class="invalid-feedback">
+        @if (password.errors?.['required']) {
+        <div>Password is required.</div>
+        } @if (password.errors?.['minlength']; as minErr) {
+        <div>Minimum {{ minErr.requiredLength }} characters.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Confirm Password</label>
+      <input
+        type="password"
+        class="form-control"
+        formControlName="confirmPassword"
+        [ngClass]="{'is-invalid':
+          (confirmPassword.touched && confirmPassword.invalid) ||
+          (signupForm.errors?.['passwordsMismatch'] && confirmPassword.touched)
+        }"
+      />
+      @if (confirmPassword.touched && confirmPassword.invalid) {
+      <div class="invalid-feedback">You must confirm the password.</div>
+      } @if (signupForm.errors?.['passwordsMismatch'] &&
+      confirmPassword.touched) {
+      <div class="invalid-feedback">The passwords do not match.</div>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">User type</label>
+      <select
+        class="form-select"
+        formControlName="userType"
+        [ngClass]="{'is-invalid': userType.touched && userType.invalid}"
+      >
+        <option value="" disabled>Select an option</option>
+        <option value="PROMOTER">Project promoter</option>
+        <option value="INVESTOR">Investor</option>
+      </select>
+      @if (userType.touched && userType.invalid) {
+      <div class="invalid-feedback">You must select a user type.</div>
+      }
+    </div>
+
+    @if (errorMessage) {
+    <div class="alert alert-danger text-center">{{ errorMessage }}</div>
+    }
+
+    <button
+      type="submit"
+      class="btn btn-primary w-100"
+      [disabled]="signupForm.invalid || loading"
+    >
+      @if (!loading) {
+      <span>Sign Up</span>
+      } @if (loading) {
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+       <span> Signing up...</span>
+      }
+    </button>
+  </form>
+</div>

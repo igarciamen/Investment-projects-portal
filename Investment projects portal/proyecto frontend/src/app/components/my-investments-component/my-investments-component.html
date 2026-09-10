@@ -1,0 +1,46 @@
+<div class="page-header">
+  <div class="container-inner">
+    <h1>My investments</h1>
+  </div>
+</div>
+
+<div class="container-inner main-content">
+
+  @if (loading) {
+    <p class="muted">Loading your expressions of interest...</p>
+  } @else if (rows.length === 0) {
+    <p class="muted">You haven't expressed interest in any project yet. Browse the <a routerLink="/projects">catalog</a> to find one.</p>
+  } @else {
+    <table class="investments-table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Status</th>
+          <th>Interest sent</th>
+          <th>Messages</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.interest.id) {
+          <tr [routerLink]="row.project ? ['/projects', row.project.id] : null" class="investment-row">
+            <td class="title-cell">{{ row.project?.title ?? 'Project no longer available' }}</td>
+            <td>
+              @if (row.project) {
+                <span class="status-badge" [class]="'status-' + row.project.status.toLowerCase()">{{ row.project.status }}</span>
+              }
+            </td>
+            <td>{{ row.interest.createdAt | date:'d MMM y' }}</td>
+            <td>
+              @if (row.unreadCount > 0) {
+                <span class="unread-badge">{{ row.unreadCount }} new</span>
+              } @else {
+                <span class="muted-inline">Up to date</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+</div>

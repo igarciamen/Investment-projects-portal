@@ -1,0 +1,60 @@
+<div class="page-header">
+  <div class="container-inner">
+    <h1>Submit a new project</h1>
+  </div>
+</div>
+
+<div class="container-inner main-content">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="project-form">
+
+    <div class="mb-3">
+      <label class="form-label">Sector</label>
+      <select formControlName="sectorId" class="form-select" [ngClass]="{'is-invalid': sectorId.touched && sectorId.invalid}">
+        <option value="" disabled>Select a sector</option>
+        @for (sector of sectors; track sector.id) {
+          <option [value]="sector.id">{{ sector.name }}</option>
+        }
+      </select>
+      @if (sectorId.touched && sectorId.invalid) {
+        <div class="invalid-feedback">You must select a sector.</div>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Project title</label>
+      <input formControlName="title" type="text" class="form-control" [ngClass]="{'is-invalid': title.touched && title.invalid}" />
+      @if (title.touched && title.invalid) {
+        <div class="invalid-feedback">Title is required (max 120 characters).</div>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <textarea formControlName="description" rows="4" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Country</label>
+      <input formControlName="country" type="text" class="form-control" [ngClass]="{'is-invalid': country.touched && country.invalid}" />
+      @if (country.touched && country.invalid) {
+        <div class="invalid-feedback">Country is required.</div>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Requested amount (€)</label>
+      <input formControlName="requestedAmount" type="number" step="0.01" class="form-control" [ngClass]="{'is-invalid': requestedAmount.touched && requestedAmount.invalid}" />
+      @if (requestedAmount.touched && requestedAmount.invalid) {
+        <div class="invalid-feedback">Enter an amount greater than 0.</div>
+      }
+    </div>
+
+    @if (errorMessage) {
+      <div class="alert alert-danger">{{ errorMessage }}</div>
+    }
+
+    <button type="submit" class="btn-submit" [disabled]="loading">
+      {{ loading ? 'Submitting...' : 'Create project (draft)' }}
+    </button>
+  </form>
+</div>

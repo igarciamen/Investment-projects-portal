@@ -1,0 +1,112 @@
+:host {
+  --eu-blue: #003399;
+  --eu-blue-dark: #002266;
+  --eu-yellow: #ffd617;
+  --text-muted: #5a6472;
+  --border-light: #dde3ea;
+  display: block;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.page-header {
+  background: linear-gradient(135deg, var(--eu-blue) 0%, var(--eu-blue-dark) 100%);
+  color: #fff;
+  padding: 2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.page-header .container-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+}
+.page-header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+}
+.btn-new {
+  background: var(--eu-yellow);
+  color: var(--eu-blue-dark);
+  text-decoration: none;
+  font-weight: 700;
+  padding: 0.6rem 1.1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.container-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.main-content {
+  padding: 1.75rem 1.5rem 3rem;
+}
+.muted {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.projects-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.projects-table th {
+  text-align: left;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  padding: 0.6rem 0.75rem;
+  border-bottom: 2px solid var(--border-light);
+}
+.projects-table td {
+  padding: 0.85rem 0.75rem;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.9rem;
+}
+.project-row {
+  cursor: pointer;
+}
+.project-row:hover {
+  background: #f4f6f9;
+}
+.title-cell {
+  font-weight: 600;
+  color: var(--eu-blue);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+}
+.status-draft { background: #6c757d; }
+.status-submitted { background: #0d6efd; }
+.status-under_review { background: #fd7e14; }
+.status-approved { background: #198754; }
+.status-rejected { background: #dc3545; }
+
+@media (max-width: 650px) {
+  .projects-table thead {
+    display: none;
+  }
+  .projects-table, .projects-table tbody, .projects-table tr, .projects-table td {
+    display: block;
+    width: 100%;
+  }
+  .projects-table tr {
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+  }
+}

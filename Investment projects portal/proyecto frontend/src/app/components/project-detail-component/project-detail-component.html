@@ -1,0 +1,246 @@
+@if (loading) {
+  <div class="container-inner main-content"><p class="muted">Loading project...</p></div>
+} @else if (notFound || !project) {
+  <div class="container-inner main-content">
+    <p class="muted">This project doesn't exist, or isn't visible to you yet.</p>
+    <a routerLink="/projects">Back to the catalog</a>
+  </div>
+} @else {
+
+  <div class="page-header">
+    <div class="container-inner">
+      <span class="status-badge" [class]="'status-' + project.status.toLowerCase()">{{ project.status }}</span>
+      <h1>{{ project.title }}</h1>
+      <p class="meta-line">{{ sectorName }} &middot; {{ project.country }} &middot; {{ project.requestedAmount | currency:'EUR' }}</p>
+    </div>
+  </div>
+
+  <div class="container-inner main-content">
+
+    <section class="description-section">
+      <h2>Project description</h2>
+      <p>{{ project.description || 'No description provided.' }}</p>
+
+      @if (project.status === 'REJECTED' && project.rejectionReason) {
+        <div class="alert alert-warning">
+          <strong>Rejection reason:</strong> {{ project.rejectionReason }}
+        </div>
+      }
+    </section>
+
+    @if (isOwner && project.status === 'DRAFT') {
+      <section class="action-section">
+        <h2>Ready to submit?</h2>
+        <p>Once submitted, this project can no longer be edited until it has been reviewed.</p>
+        @if (submitError) {
+          <div class="alert alert-danger">{{ submitError }}</div>
+        }
+        <button class="btn-primary" [disabled]="submitting" (click)="onSubmitProject()">
+          {{ submitting ? 'Submitting...' : 'Submit for review' }}
+        </button>
+      </section>
+    }
+
+    @if (isAdmin && (project.status === 'SUBMITTED' || project.status === 'UNDER_REVIEW')) {
+      <section class="action-section admin-section">
+        <h2>Admin actions</h2>
+
+        @if (adminActionError) {
+          <div class="alert alert-danger">{{ adminActionError }}</div>
+        }
+
+        @if (project.status === 'SUBMITTED') {
+          <button class="btn-primary" [disabled]="adminActionInProgress" (click)="onStartReview()">
+            {{ adminActionInProgress ? 'Starting...' : 'Start review' }}
+          </button>
+        }
+
+        @if (project.status === 'UNDER_REVIEW') {
+          <div class="admin-buttons">
+            <button class="btn-approve" [disabled]="adminActionInProgress" (click)="onApprove()">
+              {{ adminActionInProgress ? 'Approving...' : 'Approve' }}
+            </button>
+            <button class="btn-reject" [disabled]="adminActionInProgress" (click)="showRejectForm = !showRejectForm">
+              Reject
+            </button>
+          </div>
+
+          @if (showRejectForm) {
+            <form [formGroup]="rejectForm" (ngSubmit)="onReject()" class="reject-form">
+              <textarea formControlName="reason" rows="2" placeholder="Reason for rejection (optional)" class="form-control"></textarea>
+              <button type="submit" class="btn-reject" [disabled]="adminActionInProgress">
+                {{ adminActionInProgress ? 'Rejecting...' : 'Confirm rejection' }}
+              </button>
+            </form>
+          }
+        }
+      </section>
+    }
+
+    @if (project.status === 'APPROVED' && auth.isAuthenticated() && auth.hasRole('ROLE_INVESTOR')) {
+      <section class="action-section">
+        <h2>Interested in this project?</h2>
+
+        @if (interestSent || alreadyInterested) {
+          <p class="success-note">You have already expressed interest in this project. The promoter can now see your details and get in touch.</p>
+        } @else {
+          <form [formGroup]="interestForm" (ngSubmit)="onExpressInterest()">
+            <textarea formControlName="message" rows="3" placeholder="Optional message to the promoter (e.g. what you're looking for)" class="form-control"></textarea>
+            @if (interestError) {
+              <div class="alert alert-danger">{{ interestError }}</div>
+            }
+            <button type="submit" class="btn-primary" [disabled]="sendingInterest">
+              {{ sendingInterest ? 'Sending...' : 'Express interest' }}
+            </button>
+          </form>
+        }
+      </section>
+    }
+
+    @if (project.status === 'APPROVED' && !auth.isAuthenticated()) {
+      <section class="action-section">
+        <p>
+          <a routerLink="/signup" [queryParams]="{type: 'INVESTOR'}">Register as an investor</a>
+          to express interest in this project and contact its promoter.
+        </p>
+      </section>
+    }
+
+    @if (isOwner || isAdmin) {
+      <section class="action-section documents-section">
+        <h2>Documents</h2>
+
+        @if (documentsError) {
+          <div class="alert alert-danger">{{ documentsError }}</div>
+        }
+
+        @if (documentsLoading) {
+          <p class="muted">Loading documents...</p>
+        } @else if (documents.length === 0) {
+          <p class="muted">No documents uploaded yet.</p>
+        } @else {
+          <ul class="documents-list">
+            @for (doc of documents; track doc.id) {
+              <li class="document-row">
+                <span class="doc-type">{{ doc.documentType.replace('_', ' ') }}</span>
+                <span class="doc-name">{{ doc.originalFilename }}</span>
+                <span class="doc-size">{{ (doc.sizeBytes / 1024) | number:'1.0-0' }} KB</span>
+                <button class="btn-link" (click)="onDownloadDocument(doc)">Download</button>
+                <button class="btn-link btn-link-danger" (click)="onDeleteDocument(doc)">Delete</button>
+              </li>
+            }
+          </ul>
+        }
+
+        <form [formGroup]="uploadForm" (ngSubmit)="onUploadDocument()" class="upload-form">
+          <select formControlName="documentType" class="form-select">
+            <option value="" disabled>Select document type</option>
+            <option value="BUSINESS_PLAN">Business plan</option>
+            <option value="ANNUAL_ACCOUNTS">Annual accounts</option>
+            <option value="TECHNICAL_REPORT">Technical report</option>
+          </select>
+          <input type="file" (change)="onFileSelected($event)" class="form-control" />
+          @if (uploadError) {
+            <div class="alert alert-danger">{{ uploadError }}</div>
+          }
+          <button type="submit" class="btn-primary" [disabled]="uploading || !selectedFile">
+            {{ uploading ? 'Uploading...' : 'Upload document' }}
+          </button>
+        </form>
+      </section>
+    }
+
+    @if (auth.isAuthenticated() && auth.hasRole('ROLE_INVESTOR') && project.status === 'APPROVED') {
+      <section class="action-section chat-section">
+        <h2>Contact the promoter</h2>
+
+        @if (chatError) {
+          <div class="alert alert-danger">{{ chatError }}</div>
+        }
+
+        @if (threadLoading) {
+          <p class="muted">Loading conversation...</p>
+        } @else {
+          <div class="chat-thread">
+            @for (msg of threadMessages; track msg.id) {
+              <div class="chat-bubble" [class.chat-bubble-mine]="msg.senderRole === 'ROLE_INVESTOR'">
+                <span class="chat-sender">{{ msg.senderRole === 'ROLE_INVESTOR' ? 'You' : 'Promoter' }}</span>
+                <p>{{ msg.content }}</p>
+                <span class="chat-time">{{ msg.createdAt | date:'d MMM, HH:mm' }}</span>
+              </div>
+            }
+            @if (threadMessages.length === 0) {
+              <p class="muted">No messages yet — say hello to the promoter.</p>
+            }
+          </div>
+
+          <form [formGroup]="chatForm" (ngSubmit)="onSendChatMessage()" class="chat-form">
+            <input formControlName="content" type="text" placeholder="Write a message..." class="form-control" />
+            <button type="submit" class="btn-primary" [disabled]="sendingChatMessage || chatForm.invalid">
+              {{ sendingChatMessage ? 'Sending...' : 'Send' }}
+            </button>
+          </form>
+        }
+      </section>
+    }
+
+    @if (isOwner || isAdmin) {
+      <section class="action-section chat-section">
+        <h2>Investor conversations</h2>
+
+        @if (conversationsLoading) {
+          <p class="muted">Loading conversations...</p>
+        } @else if (conversations.length === 0) {
+          <p class="muted">No investor has reached out yet.</p>
+        } @else {
+          <div class="conversation-list">
+            @for (conv of conversations; track conv.investorId) {
+              <button
+                class="conversation-item"
+                [class.conversation-item-active]="activeInvestorId === conv.investorId"
+                (click)="openConversation(conv.investorId)">
+                <span class="conv-label">
+                  Investor #{{ conv.investorId }}
+                  @if ((conversationUnreadCounts.get(conv.investorId) ?? 0) > 0) {
+                    <span class="unread-badge">{{ conversationUnreadCounts.get(conv.investorId) }}</span>
+                  }
+                </span>
+                <span class="conv-last">{{ conv.lastMessageAt ? (conv.lastMessageAt | date:'d MMM, HH:mm') : 'No messages yet' }}</span>
+              </button>
+            }
+          </div>
+
+          @if (activeInvestorId) {
+            @if (chatError) {
+              <div class="alert alert-danger">{{ chatError }}</div>
+            }
+            @if (threadLoading) {
+              <p class="muted">Loading conversation...</p>
+            } @else {
+              <div class="chat-thread">
+                @for (msg of threadMessages; track msg.id) {
+                  <div class="chat-bubble" [class.chat-bubble-mine]="msg.senderRole === 'ROLE_PROMOTER'">
+                    <span class="chat-sender">{{ msg.senderRole === 'ROLE_PROMOTER' ? 'You' : 'Investor' }}</span>
+                    <p>{{ msg.content }}</p>
+                    <span class="chat-time">{{ msg.createdAt | date:'d MMM, HH:mm' }}</span>
+                  </div>
+                }
+                @if (threadMessages.length === 0) {
+                  <p class="muted">No messages in this conversation yet.</p>
+                }
+              </div>
+
+              <form [formGroup]="chatForm" (ngSubmit)="onSendChatMessage()" class="chat-form">
+                <input formControlName="content" type="text" placeholder="Write a reply..." class="form-control" />
+                <button type="submit" class="btn-primary" [disabled]="sendingChatMessage || chatForm.invalid">
+                  {{ sendingChatMessage ? 'Sending...' : 'Send' }}
+                </button>
+              </form>
+            }
+          }
+        }
+      </section>
+    }
+
+  </div>
+}

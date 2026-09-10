@@ -1,0 +1,40 @@
+<div class="page-header">
+  <div class="container-inner">
+    <h1>Investment Projects Portal</h1>
+  </div>
+</div>
+
+<div class="container-inner main-content">
+  <div class="terms-card">
+    <p class="intro-text">Before entering the Portal, please agree to the Terms and Conditions of the Investment Projects Portal.</p>
+
+    <div class="terms-box">
+      <h2>1. Terms and Conditions</h2>
+      <p>
+        By registering on the Investment Projects Portal, you confirm that the information you provide is accurate
+        and that you are authorized to submit it. The Portal is a matchmaking space connecting project
+        promoters with potential investors — it does not process any financial commitment, transfer, or
+        contract between the parties, and it is not a financial intermediary.
+      </p>
+      <p>
+        Any contact information you share (email, project details, messages exchanged through the Portal)
+        will only be used to enable communication between promoters and investors already registered on
+        the Portal, and to operate the review and approval process for submitted projects.
+      </p>
+      <p>
+        You are responsible for the content you submit through the Portal, including project descriptions
+        and any documents you upload. The Portal's administrators may reject or remove content that does
+        not meet the Portal's evaluation criteria.
+      </p>
+    </div>
+
+    <label class="agree-row">
+      <input type="checkbox" [(ngModel)]="agreed" name="agreed" />
+      <span>I have read and agree to the Terms and Conditions</span>
+    </label>
+
+    <button class="btn-continue" [disabled]="!agreed" (click)="onContinue()">
+      Continue to registration
+    </button>
+  </div>
+</div>

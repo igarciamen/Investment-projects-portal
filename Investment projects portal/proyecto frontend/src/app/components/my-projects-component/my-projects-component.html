@@ -1,0 +1,39 @@
+<div class="page-header">
+  <div class="container-inner">
+    <h1>My projects</h1>
+    <a routerLink="/projects/new" class="btn-new">+ Submit a new project</a>
+  </div>
+</div>
+
+<div class="container-inner main-content">
+
+  @if (loading) {
+    <p class="muted">Loading your projects...</p>
+  } @else if (projects.length === 0) {
+    <p class="muted">You haven't submitted any project yet.</p>
+  } @else {
+    <table class="projects-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Country</th>
+          <th>Requested amount</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (project of projects; track project.id) {
+          <tr [routerLink]="['/projects', project.id]" class="project-row">
+            <td class="title-cell">{{ project.title }}</td>
+            <td><span class="status-badge" [class]="'status-' + project.status.toLowerCase()">{{ project.status }}</span></td>
+            <td>{{ project.country }}</td>
+            <td>{{ project.requestedAmount | currency:'EUR' }}</td>
+            <td>{{ project.createdAt | date:'d MMM y' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+</div>

@@ -1,0 +1,62 @@
+<div class="page-header">
+  <div class="container-inner">
+    <h1>Find investment opportunities</h1>
+  </div>
+</div>
+
+<div class="info-banner">
+  <div class="container-inner">
+    As an investor, you need to be registered on the Investment Projects Portal to express interest in a project or contact its promoter.
+    <a routerLink="/signup" [queryParams]="{type: 'INVESTOR'}">Register as an investor</a>.
+  </div>
+</div>
+
+<div class="container-inner main-content">
+
+  <form [formGroup]="filterForm" (ngSubmit)="search()" class="filter-bar">
+    <select formControlName="sector" class="filter-input">
+      <option value="">All sectors</option>
+      @for (sector of sectors; track sector.id) {
+        <option [value]="sector.id">{{ sector.name }}</option>
+      }
+    </select>
+
+    <input formControlName="country" type="text" placeholder="Country" class="filter-input" />
+
+    <input formControlName="minAmount" type="number" placeholder="Min. amount (€)" class="filter-input" />
+
+    <input formControlName="maxAmount" type="number" placeholder="Max. amount (€)" class="filter-input" />
+
+    <button type="button" class="btn-clear" (click)="clearFilters()">Clear filters</button>
+    <button type="submit" class="btn-search">Project search</button>
+  </form>
+
+  <div class="results-header">
+    <span class="results-count">
+      {{ loading ? 'Loading…' : (projects.length + ' project' + (projects.length === 1 ? '' : 's')) }}
+    </span>
+  </div>
+
+  @if (!loading && projects.length === 0) {
+    <p class="muted">No approved projects match these filters yet.</p>
+  }
+
+  <div class="results-grid">
+    @for (project of projects; track project.id) {
+      <a [routerLink]="['/projects', project.id]" class="project-card">
+        <div class="project-card-thumb"></div>
+        <div class="project-card-body">
+          <span class="project-card-code">INV-{{ project.id.toString().padStart(5, '0') }}</span>
+          <h3>{{ project.title }}</h3>
+          <p>{{ project.description }}</p>
+          <div class="project-card-meta">
+            <span>{{ project.requestedAmount | currency:'EUR' }}</span>
+            <span>{{ sectorName(project.sectorId) }}</span>
+            <span>{{ project.country }}</span>
+          </div>
+        </div>
+      </a>
+    }
+  </div>
+
+</div>

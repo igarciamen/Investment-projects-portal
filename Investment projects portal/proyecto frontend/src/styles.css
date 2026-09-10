@@ -1,0 +1,78 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* ==========================================================
+   InvestEU — global design tokens.
+   Bootstrap 5 themes itself through its own CSS custom properties
+   (--bs-primary, --bs-link-color, --bs-focus-ring-color, etc.). Overriding
+   them once, here, retints every native Bootstrap form/button/link across
+   the whole app — including login and signup, which predate this palette
+   and are never touched directly — without needing to edit each
+   component's own CSS.
+   ========================================================== */
+
+:root {
+  --eu-blue: #003399;
+  --eu-blue-dark: #002266;
+  --eu-yellow: #ffd617;
+  --eu-yellow-dark: #e0b800;
+  --eu-text-dark: #1a1a2e;
+  --eu-text-muted: #5a6472;
+  --eu-border-light: #dde3ea;
+  --eu-bg-light: #f4f6f9;
+
+  /* ---- Bootstrap 5 theme variables ---- */
+  --bs-primary: var(--eu-blue);
+  --bs-primary-rgb: 0, 51, 153;
+  --bs-link-color: var(--eu-blue);
+  --bs-link-color-rgb: 0, 51, 153;
+  --bs-link-hover-color: var(--eu-blue-dark);
+  --bs-link-hover-color-rgb: 0, 34, 102;
+  --bs-focus-ring-color: rgba(0, 51, 153, 0.25);
+  --bs-body-font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --bs-body-color: var(--eu-text-dark);
+}
+
+body {
+  font-family: var(--bs-body-font-family);
+}
+
+/* Bootstrap's .btn-primary computes its background from --bs-primary
+   already, but its hover/active shades are pre-baked at build time from
+   Bootstrap's own default blue -- these two rules correct just that,
+   without needing to recompile Bootstrap's SASS. */
+.btn-primary {
+  background-color: var(--eu-blue);
+  border-color: var(--eu-blue);
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--eu-blue-dark) !important;
+  border-color: var(--eu-blue-dark) !important;
+}
+
+/* Same reasoning for form-control focus rings and checked form-check
+   inputs (checkboxes/radios), used throughout login, signup, and terms. */
+.form-control:focus {
+  border-color: var(--eu-blue);
+  box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+.form-check-input:checked {
+  background-color: var(--eu-blue);
+  border-color: var(--eu-blue);
+}
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+/* Defensive safety net: prevents any single oversized/overflowing element
+   anywhere in the app from pushing the whole page wider than the viewport
+   on narrow screens (the symptom being a horizontal scrollbar, missing
+   left margin, and text appearing cut off on the right). Bootstrap 5's own
+   reset already sets box-sizing: border-box globally, so this only needs
+   to guard against overflow itself, not box-model math. */
+html, body {
+  overflow-x: hidden;
+  margin: 0;
+}

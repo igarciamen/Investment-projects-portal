@@ -1,0 +1,37 @@
+:host {
+  --eu-blue: #003399;
+  --eu-blue-dark: #002266;
+  --eu-yellow: #ffd617;
+  display: block;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.page-header {
+  background: linear-gradient(135deg, var(--eu-blue) 0%, var(--eu-blue-dark) 100%);
+  color: #fff;
+  padding: 2rem 1.5rem;
+}
+.page-header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+}
+.container-inner {
+  max-width: 700px;
+  margin: 0 auto;
+}
+.main-content {
+  padding: 2rem 1.5rem 3rem;
+}
+.btn-submit {
+  background: var(--eu-yellow);
+  color: var(--eu-blue-dark);
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

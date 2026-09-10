@@ -1,0 +1,74 @@
+<div class="page-header">
+  <div class="container-inner">
+    <h1>Admin dashboard</h1>
+  </div>
+</div>
+
+<div class="container-inner main-content">
+
+  @if (loading) {
+    <p class="muted">Loading dashboard...</p>
+  } @else {
+
+    @if (metrics) {
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-value">{{ metrics.draft }}</span>
+          <span class="metric-label">Draft</span>
+        </div>
+        <div class="metric-card metric-highlight">
+          <span class="metric-value">{{ metrics.submitted }}</span>
+          <span class="metric-label">Submitted</span>
+        </div>
+        <div class="metric-card metric-highlight">
+          <span class="metric-value">{{ metrics.underReview }}</span>
+          <span class="metric-label">Under review</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-value">{{ metrics.approved }}</span>
+          <span class="metric-label">Approved</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-value">{{ metrics.rejected }}</span>
+          <span class="metric-label">Rejected</span>
+        </div>
+        <div class="metric-card metric-total">
+          <span class="metric-value">{{ metrics.total }}</span>
+          <span class="metric-label">Total</span>
+        </div>
+      </div>
+    }
+
+    <h2>Pending evaluation</h2>
+    @if (pending.length === 0) {
+      <p class="muted">Nothing waiting for review right now.</p>
+    } @else {
+      <table class="pending-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th>Evaluation deadline</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (project of pending; track project.id) {
+            <tr [routerLink]="['/projects', project.id]" class="pending-row">
+              <td class="title-cell">{{ project.title }}</td>
+              <td><span class="status-badge" [class]="'status-' + project.status.toLowerCase()">{{ project.status }}</span></td>
+              <td>{{ project.submittedAt | date:'d MMM y' }}</td>
+              <td [class.due-soon]="isDueSoon(project.evaluationDeadline)">
+                {{ project.evaluationDeadline | date:'d MMM y' }}
+                @if (isDueSoon(project.evaluationDeadline)) {
+                  <span class="due-soon-tag">due soon</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+
+</div>
