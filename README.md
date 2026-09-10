@@ -13,7 +13,7 @@ catalog, express interest, and contact the promoter directly.
 True to the real portal, **no financial transaction ever happens inside this
 platform**. Closing an investment (transfer, contract, due diligence) is
 out of scope, exactly as it is on the real InvestEU Portal, the
-system is a showcase and a point of contact, nothing more.
+system is a showcase and a point of contact.
 
 
 ## Architecture
@@ -64,8 +64,7 @@ token.
 **Backend:** Java 21, Spring Boot, Spring Security (JWT / OAuth2 Resource
 Server), Spring Data JPA, PostgreSQL, springdoc-openapi (Swagger UI).
 
-**Backend testing:** JUnit 5, Mockito, ArchUnit, H2 (in-memory, for
-integration tests), MockMvc.
+**Backend testing:** JUnit 5, Mockito, ArchUnit, MockMvc.
 
 **Frontend:** Angular (standalone components), RxJS, Angular Reactive Forms,
 Bootstrap 5.
@@ -106,7 +105,7 @@ reset the database.
 ## Running individual services locally
 
 Each backend module has its own `pom.xml` and can be run independently from
-your IDE (`mvn spring-boot:run`, or the IDE's own run configuration) against
+an IDE (`mvn spring-boot:run`, or the IDE's own run configuration) against
 a local PostgreSQL instance. The frontend runs with the standard Angular CLI:
 
 ```bash
