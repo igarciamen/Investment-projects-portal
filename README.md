@@ -19,22 +19,8 @@ microservices backend in Spring Boot and an Angular frontend.
 
 ## Demo
 
-A 40-second walkthrough of the core flow — browsing the catalog, submitting
-a project, admin approval, and investor contact:
 
-```md
-![Demo](docs/demo.gif)
-```
-
-or, if hosted externally instead of as a GIF:
-
-```md
-[![Watch the demo](docs/demo-thumbnail.png)](https://your-video-link-here)
-```
-
-Replace the path/link above with wherever you upload the recording (a `.gif`
-in the repo plays automatically on GitHub; an `.mp4` needs to be hosted
-externally, since GitHub does not embed video files directly in a README).
+https://github.com/user-attachments/assets/320ab818-9aaf-4507-bc9e-a3d9b0079649
 
 ---
 
