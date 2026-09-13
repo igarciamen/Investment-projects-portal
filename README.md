@@ -1,7 +1,7 @@
 # Investment Projects Platform (Promoter / Investor)
 
 ## Demo
-https://github.com/user-attachments/assets/e9ecf8a1-2c3e-428e-bc34-61a87e899688
+https://github.com/user-attachments/assets/891b731a-f89b-4a74-b306-04f041be6858
 
 A matchmaking platform connecting investment project promoters with potential
 investors, built as a functional and visual replica of the European
